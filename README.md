@@ -58,7 +58,7 @@ export SLACK_WEBHOOK_URL="https://hooks.slack.com/services/XXX/YYY/ZZZ"
    ./system_report.py
    ```
 
-3. To schedule hourly execution via cron, edit the crontab for user **pi**:
+3. To schedule hourly execution via cron, edit your crontab (run `crontab -e` as the intended user; replace **pi** with your username if necessary):
 
    ```bash
    crontab -e
@@ -67,7 +67,7 @@ export SLACK_WEBHOOK_URL="https://hooks.slack.com/services/XXX/YYY/ZZZ"
    Add this line:
 
    ```
-   @hourly /home/pi/work/project/slack/raspi-system-report-to-slack/system_report.py
+   @hourly /path/to/raspi-system-report-to-slack/system_report.py
    ```
 
    The script will send one report immediately when invoked, so the cron job will produce exactly one report each hour.
@@ -82,7 +82,7 @@ Description=Raspberry Pi System Report to Slack
 After=network.target
 
 [Service]
-ExecStart=/usr/bin/env bash -lc 'source /home/pi/work/project/slack/raspi-system-report-to-slack/venv/bin/activate && python3 /home/pi/work/project/slack/raspi-system-report-to-slack/system_report.py'
+ExecStart=/usr/bin/env bash -lc 'source /path/to/raspi-system-report-to-slack/venv/bin/activate && python3 /path/to/raspi-system-report-to-slack/system_report.py'
 Restart=on-failure
 User=pi
 Environment=SLACK_WEBHOOK_URL=https://hooks.slack.com/services/XXX/YYY/ZZZ
