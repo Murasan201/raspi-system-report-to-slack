@@ -1,6 +1,6 @@
 # RasPi System Report to Slack
 
-> Python script for Raspberry Pi that periodically collects CPU temperature, memory usage, and disk space statistics, then sends formatted reports to Slack via Incoming Webhooks.
+> Python script for Raspberry Pi that collects CPU temperature, memory usage, and disk free-space statistics, then sends a formatted report to Slack via an Incoming Webhook.
 
 ## Features
 
@@ -8,7 +8,6 @@
 - Monitor memory usage (percentage and GB)  
 - Check disk free space  
 - Send formatted report to Slack channel via Incoming Webhook  
-- Schedule periodic reports (default: every hour)  
 
 ## Prerequisites
 
@@ -23,45 +22,59 @@
    git clone https://github.com/<your-username>/raspi-system-report-to-slack.git
    cd raspi-system-report-to-slack
    ```  
-2. Install dependencies:  
+2. Install dependencies using the system package manager:  
    ```bash
-   pip3 install -r requirements.txt
+   sudo apt-get update
+   sudo apt-get install -y python3-psutil python3-requests
    ```  
 
-Alternatively, install individually:  
-```bash
-pip3 install psutil schedule requests
-```
+   Or with pip in a virtual environment:
+
+   ```bash
+   python3 -m venv venv
+   source venv/bin/activate
+   pip install psutil requests
+   ```
 
 ## Configuration
 
-Set the Slack Incoming Webhook URL as an environment variable:  
+Set your Slack Incoming Webhook URL as an environment variable:
+
 ```bash
 export SLACK_WEBHOOK_URL="https://hooks.slack.com/services/XXX/YYY/ZZZ"
 ```
 
 ## Usage
 
-Run the script:  
-```bash
-chmod +x system_report.py
-./system_report.py
-```  
-The script sends an initial report immediately and then every hour by default.
+1. Make the script executable:
 
-### Customize Schedule
+   ```bash
+   chmod +x system_report.py
+   ```
 
-Modify the scheduling section in `system_report.py` to adjust frequency:  
-```python
-# e.g., every 30 minutes
-schedule.every(30).minutes.do(job)
-# or daily at 09:00
-schedule.every().day.at("09:00").do(job)
-```
+2. Run it manually for an immediate report:
+
+   ```bash
+   ./system_report.py
+   ```
+
+3. To schedule hourly execution via cron, edit the crontab for user **pi**:
+
+   ```bash
+   crontab -e
+   ```
+
+   Add this line:
+
+   ```
+   @hourly /home/pi/work/project/slack/raspi-system-report-to-slack/system_report.py
+   ```
+
+   The script will send one report immediately when invoked, so the cron job will produce exactly one report each hour.
 
 ## (Optional) Setup as a systemd Service
 
-Create a `raspi-system-report.service` file in `/etc/systemd/system/`:
+Create `/etc/systemd/system/raspi-system-report.service`:
 
 ```ini
 [Unit]
@@ -69,8 +82,8 @@ Description=Raspberry Pi System Report to Slack
 After=network.target
 
 [Service]
-ExecStart=/usr/bin/env python3 /home/pi/raspi-system-report-to-slack/system_report.py
-Restart=always
+ExecStart=/usr/bin/env bash -lc 'source /home/pi/work/project/slack/raspi-system-report-to-slack/venv/bin/activate && python3 /home/pi/work/project/slack/raspi-system-report-to-slack/system_report.py'
+Restart=on-failure
 User=pi
 Environment=SLACK_WEBHOOK_URL=https://hooks.slack.com/services/XXX/YYY/ZZZ
 
@@ -78,7 +91,8 @@ Environment=SLACK_WEBHOOK_URL=https://hooks.slack.com/services/XXX/YYY/ZZZ
 WantedBy=multi-user.target
 ```
 
-Enable and start the service:  
+Enable and start:
+
 ```bash
 sudo systemctl daemon-reload
 sudo systemctl enable raspi-system-report
@@ -87,13 +101,8 @@ sudo systemctl start raspi-system-report
 
 ## Contributing
 
-Contributions are welcome! Feel free to open issues or submit pull requests.
-
-## Author
-
-- Murasan  
-  https://murasan-net.com/
+Contributions welcome! Open issues or submit pull requests.
 
 ## License
 
-This project is licensed under the MIT License.
+MIT License

@@ -5,7 +5,6 @@ import os
 import time
 import psutil
 import requests
-import schedule
 
 # 環境変数から Slack Webhook URL を取得
 SLACK_WEBHOOK_URL = os.getenv("SLACK_WEBHOOK_URL")
@@ -50,7 +49,7 @@ def post_to_slack(message: str):
     resp.raise_for_status()
 
 def job():
-    """定期実行ジョブ：システム情報を取得して Slack へ送信"""
+    """システム情報を取得して Slack へ送信"""
     cpu_temp = get_cpu_temperature()
     mem_pct, mem_used, mem_total = get_memory_usage()
     disk_pct, disk_free, disk_total = get_disk_usage()
@@ -66,14 +65,4 @@ def job():
     print(f"[{time.strftime('%Y-%m-%d %H:%M:%S')}] Report sent to Slack")
 
 if __name__ == "__main__":
-    # 実行間隔の設定（例：1時間ごと）
-    schedule.every(1).hour.do(job)
-    print("Starting system report scheduler...")
-
-    # 最初のレポートを即時実行
     job()
-
-    # スケジューラループ
-    while True:
-        schedule.run_pending()
-        time.sleep(1)
