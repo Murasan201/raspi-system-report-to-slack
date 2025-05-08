@@ -19,7 +19,7 @@
 
 1. Clone the repository:  
    ```bash
-   git clone https://github.com/<your-username>/raspi-system-report-to-slack.git
+   git clone https://github.com/Murasan201/raspi-system-report-to-slack.git
    cd raspi-system-report-to-slack
    ```  
 2. Install dependencies using the system package manager:  
