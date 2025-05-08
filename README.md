@@ -103,6 +103,10 @@ sudo systemctl start raspi-system-report
 
 Contributions welcome! Open issues or submit pull requests.
 
+## Author
+
+- Murasan: https://murasan-net.com/
+
 ## License
 
 MIT License
